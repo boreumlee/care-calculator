@@ -1,301 +1,454 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026년 장기요양보험 수가표 & 본인부담금 계산기</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-50 min-h-screen py-10 text-slate-800">
-  <div class="max-w-4xl mx-auto px-4 space-y-10">
-    
-    <!-- 헤더 -->
-    <header class="text-center">
-      <h1 class="text-3xl font-bold text-slate-900 tracking-tight">2026년 장기요양보험 수가 안내</h1>
-      <p class="text-slate-500 mt-2">보건복지부 고시 기준 전체 수가표 조회 및 맞춤 본인부담금 자동 계산</p>
-    </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2026년 장기요양보험 수가표 & 본인부담금 계산기</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-50 min-h-screen py-10 text-slate-800">
+    <div class="max-w-4xl mx-auto px-4 space-y-10">
+      <!-- 헤더 -->
+      <header class="text-center">
+        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
+          2026년 장기요양보험 수가 안내
+        </h1>
+        <p class="text-slate-500 mt-2">
+          보건복지부 고시 기준 전체 수가표 조회 및 맞춤 본인부담금 자동 계산
+        </p>
+      </header>
 
-    <!-- SECTION 1: 상단 탭 방식 수가표 안내 -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-slate-900">📋 2026년 장기요양 급여 종류별 수가표</h2>
-        <span class="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-full">공식 고시 기준</span>
-      </div>
-
-      <!-- 탭 메뉴 버튼 -->
-      <div class="flex border-b border-slate-200 mb-6 gap-2">
-        <button onclick="switchTab('limitTab')" id="btn-limitTab" class="tab-btn font-semibold px-4 py-2 border-b-2 border-blue-600 text-blue-600 transition">
-          재가급여 월 한도액
-        </button>
-        <button onclick="switchTab('visitTab')" id="btn-visitTab" class="tab-btn font-semibold px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
-          방문요양 수가표
-        </button>
-        <button onclick="switchTab('facilityTab')" id="btn-facilityTab" class="tab-btn font-semibold px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
-          시설급여(요양원) 수가표
-        </button>
-      </div>
-
-      <!-- TAB 1: 재가급여 월 한도액 -->
-      <div id="limitTab" class="tab-content overflow-x-auto">
-        <table class="w-full text-sm text-left text-slate-600">
-          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b">
-            <tr>
-              <th class="py-3 px-4">장기요양 등급</th>
-              <th class="py-3 px-4 text-right">월 한도액 (100%)</th>
-              <th class="py-3 px-4 text-right">일반 본인부담 (15%)</th>
-              <th class="py-3 px-4 text-right">국가 지원금 (85%)</th>
-            </tr>
-          </thead>
-          <tbody id="limitTableBody" class="divide-y divide-slate-100"></tbody>
-        </table>
-      </div>
-
-      <!-- TAB 2: 방문요양 이용시간별 수가표 -->
-      <div id="visitTab" class="tab-content hidden overflow-x-auto">
-        <table class="w-full text-sm text-left text-slate-600">
-          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b">
-            <tr>
-              <th class="py-3 px-4">1회 이용 시간</th>
-              <th class="py-3 px-4 text-right">1회 총 급여비용 (수가)</th>
-              <th class="py-3 px-4 text-right">일반 본인부담금 (15%)</th>
-            </tr>
-          </thead>
-          <tbody id="visitTableBody" class="divide-y divide-slate-100"></tbody>
-        </table>
-      </div>
-
-      <!-- TAB 3: 시설급여(요양원) 1일 수가표 -->
-      <div id="facilityTab" class="tab-content hidden overflow-x-auto">
-        <table class="w-full text-sm text-left text-slate-600">
-          <thead class="text-xs text-slate-700 uppercase bg-slate-100 border-b">
-            <tr>
-              <th class="py-3 px-4">등급 구분</th>
-              <th class="py-3 px-4 text-right">1일당 총 수가 (원)</th>
-              <th class="py-3 px-4 text-right">30일 이용 시 본인부담금 (20%)</th>
-            </tr>
-          </thead>
-          <tbody id="facilityTableBody" class="divide-y divide-slate-100"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- SECTION 2: 하단 계산기 (시뮬레이터) -->
-    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-      <h2 class="text-xl font-bold text-slate-900 mb-6 pb-3 border-b border-slate-100">🧮 맞춤 본인부담금 실시간 계산기</h2>
-
-      <form id="calcForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <!-- 등급 선택 -->
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">장기요양 등급</label>
-          <select id="grade" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <option value="GRADE_1">1등급</option>
-            <option value="GRADE_2">2등급</option>
-            <option value="GRADE_3" selected>3등급</option>
-            <option value="GRADE_4">4등급</option>
-            <option value="GRADE_5">5등급</option>
-            <option value="COGNITIVE">인지지원등급</option>
-          </select>
+      <!-- SECTION 1: 상단 탭 방식 수가표 안내 -->
+      <section
+        class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-slate-900">
+            📋 2026년 장기요양 급여 종류별 수가표
+          </h2>
+          <span
+            class="text-xs bg-blue-100 text-blue-800 font-semibold px-2.5 py-1 rounded-full"
+            >공식 고시 기준</span
+          >
         </div>
 
-        <!-- 본인부담율 선택 -->
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">본인부담율 감경 유형</label>
-          <select id="copayType" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <option value="GENERAL" selected>일반 (15%)</option>
-            <option value="REDUCED_9">감경 대상자 (9%)</option>
-            <option value="REDUCED_6">감경 대상자 (6%)</option>
-            <option value="BASIC_LIVING">기초생활수급자 (0%)</option>
-          </select>
-        </div>
-
-        <!-- 서비스 종류 선택 -->
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-1">이용 서비스 종류</label>
-          <select id="serviceType" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <option value="VISIT_CARE" selected>방문요양 (집에서 이용)</option>
-            <option value="FACILITY">노인요양시설 (요양원 입소)</option>
-          </select>
-        </div>
-
-        <!-- 이용시간 선택 -->
-        <div id="timeCodeWrapper">
-          <label class="block text-sm font-semibold text-slate-700 mb-1">1회 이용 시간 (방문요양)</label>
-          <select id="timeCode" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-            <option value="MIN_30">30분 이상</option>
-            <option value="MIN_60">60분 이상</option>
-            <option value="MIN_90">90분 이상</option>
-            <option value="MIN_120">120분 이상</option>
-            <option value="MIN_150">150분 이상</option>
-            <option value="MIN_180" selected>180분 이상</option>
-            <option value="MIN_210">210분 이상</option>
-            <option value="MIN_240">240분 이상</option>
-          </select>
-        </div>
-
-        <!-- 이용 일수 -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-semibold text-slate-700 mb-1">월 이용 일수(회)</label>
-          <input type="number" id="days" value="20" min="1" max="31" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
-        </div>
-
-        <!-- 버튼 -->
-        <div class="md:col-span-2 mt-2">
-          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition duration-200 shadow-sm">
-            본인부담금 계산하기
+        <!-- 탭 메뉴 버튼 -->
+        <div class="flex border-b border-slate-200 mb-6 gap-2">
+          <button
+            onclick="switchTab('limitTab')"
+            id="btn-limitTab"
+            class="tab-btn font-semibold px-4 py-2 border-b-2 border-blue-600 text-blue-600 transition"
+          >
+            재가급여 월 한도액
+          </button>
+          <button
+            onclick="switchTab('visitTab')"
+            id="btn-visitTab"
+            class="tab-btn font-semibold px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition"
+          >
+            방문요양 수가표
+          </button>
+          <button
+            onclick="switchTab('facilityTab')"
+            id="btn-facilityTab"
+            class="tab-btn font-semibold px-4 py-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition"
+          >
+            시설급여(요양원) 수가표
           </button>
         </div>
-      </form>
 
-      <!-- 계산 결과 카드 -->
-      <div id="resultCard" class="hidden mt-8 bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3">
-        <h3 class="font-bold text-slate-900 border-b border-slate-200 pb-2">📊 시뮬레이션 계산 결과</h3>
-        
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <span class="text-slate-600">월 지원 한도액:</span>
-          <span id="monthlyLimit" class="text-right font-bold text-slate-800">0 원</span>
-
-          <span class="text-slate-600">이번 달 총 급여비용:</span>
-          <span id="totalCost" class="text-right font-bold text-slate-800">0 원</span>
-
-          <span class="text-slate-600">국가 부담금 (공단 지원금):</span>
-          <span id="nhisAmount" class="text-right font-bold text-blue-600">0 원</span>
+        <!-- TAB 1: 재가급여 월 한도액 -->
+        <div id="limitTab" class="tab-content overflow-x-auto">
+          <table class="w-full text-sm text-left text-slate-600">
+            <thead
+              class="text-xs text-slate-700 uppercase bg-slate-100 border-b"
+            >
+              <tr>
+                <th class="py-3 px-4">장기요양 등급</th>
+                <th class="py-3 px-4 text-right">월 한도액 (100%)</th>
+                <th class="py-3 px-4 text-right">일반 본인부담 (15%)</th>
+                <th class="py-3 px-4 text-right">국가 지원금 (85%)</th>
+              </tr>
+            </thead>
+            <tbody
+              id="limitTableBody"
+              class="divide-y divide-slate-100"
+            ></tbody>
+          </table>
         </div>
 
-        <div class="flex justify-between items-center bg-rose-100 text-rose-800 p-3.5 rounded-lg">
-          <span class="font-bold">실제 내실 본인부담금</span>
-          <span id="copayAmount" class="font-bold text-xl">0 원</span>
+        <!-- TAB 2: 방문요양 이용시간별 수가표 -->
+        <div id="visitTab" class="tab-content hidden overflow-x-auto">
+          <table class="w-full text-sm text-left text-slate-600">
+            <thead
+              class="text-xs text-slate-700 uppercase bg-slate-100 border-b"
+            >
+              <tr>
+                <th class="py-3 px-4">1회 이용 시간</th>
+                <th class="py-3 px-4 text-right">1회 총 급여비용 (수가)</th>
+                <th class="py-3 px-4 text-right">일반 본인부담금 (15%)</th>
+              </tr>
+            </thead>
+            <tbody
+              id="visitTableBody"
+              class="divide-y divide-slate-100"
+            ></tbody>
+          </table>
         </div>
 
-        <div class="flex justify-between items-center text-xs pt-1 text-slate-500">
-          <span>남은 지원 한도액:</span>
-          <span id="remainingLimit" class="font-bold text-emerald-600 text-sm">0 원</span>
+        <!-- TAB 3: 시설급여(요양원) 1일 수가표 -->
+        <div id="facilityTab" class="tab-content hidden overflow-x-auto">
+          <table class="w-full text-sm text-left text-slate-600">
+            <thead
+              class="text-xs text-slate-700 uppercase bg-slate-100 border-b"
+            >
+              <tr>
+                <th class="py-3 px-4">등급 구분</th>
+                <th class="py-3 px-4 text-right">1일당 총 수가 (원)</th>
+                <th class="py-3 px-4 text-right">
+                  30일 이용 시 본인부담금 (20%)
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              id="facilityTableBody"
+              class="divide-y divide-slate-100"
+            ></tbody>
+          </table>
         </div>
-      </div>
-    </section>
+      </section>
 
-  </div>
+      <!-- SECTION 2: 하단 계산기 (시뮬레이터) -->
+      <section
+        class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6"
+      >
+        <h2
+          class="text-xl font-bold text-slate-900 mb-6 pb-3 border-b border-slate-100"
+        >
+          🧮 맞춤 본인부담금 실시간 계산기
+        </h2>
 
-  <script>
-    const API_BASE_URL = 'http://localhost:4000/api/v1';
-    const formatWon = (num) => new Intl.NumberFormat('ko-KR').format(num) + ' 원';
+        <form id="calcForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- 등급 선택 -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"
+              >장기요양 등급</label
+            >
+            <select
+              id="grade"
+              class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="GRADE_1">1등급</option>
+              <option value="GRADE_2">2등급</option>
+              <option value="GRADE_3" selected>3등급</option>
+              <option value="GRADE_4">4등급</option>
+              <option value="GRADE_5">5등급</option>
+              <option value="COGNITIVE">인지지원등급</option>
+            </select>
+          </div>
 
-    // 1. 탭 전환 로직
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(el => {
-        el.classList.remove('border-blue-600', 'text-blue-600');
-        el.classList.add('border-transparent', 'text-slate-500');
-      });
+          <!-- 본인부담율 선택 -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"
+              >본인부담율 감경 유형</label
+            >
+            <select
+              id="copayType"
+              class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="GENERAL" selected>일반 (15%)</option>
+              <option value="REDUCED_9">감경 대상자 (9%)</option>
+              <option value="REDUCED_6">감경 대상자 (6%)</option>
+              <option value="BASIC_LIVING">기초생활수급자 (0%)</option>
+            </select>
+          </div>
 
-      document.getElementById(tabId).classList.remove('hidden');
-      const btn = document.getElementById(`btn-${tabId}`);
-      btn.classList.remove('border-transparent', 'text-slate-500');
-      btn.classList.add('border-blue-600', 'text-blue-600');
-    }
+          <!-- 서비스 종류 선택 -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1"
+              >이용 서비스 종류</label
+            >
+            <select
+              id="serviceType"
+              class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="VISIT_CARE" selected>
+                방문요양 (집에서 이용)
+              </option>
+              <option value="FACILITY">노인요양시설 (요양원 입소)</option>
+            </select>
+          </div>
 
-    // 2. 백엔드 GET /rates API 호출해서 3개 탭 표 모두 렌더링
-    async function loadRates() {
-      try {
-        const response = await fetch(`${API_BASE_URL}/rates`);
-        const result = await response.json();
+          <!-- 이용시간 선택 -->
+          <div id="timeCodeWrapper">
+            <label class="block text-sm font-semibold text-slate-700 mb-1"
+              >1회 이용 시간 (방문요양)</label
+            >
+            <select
+              id="timeCode"
+              class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="MIN_30">30분 이상</option>
+              <option value="MIN_60">60분 이상</option>
+              <option value="MIN_90">90분 이상</option>
+              <option value="MIN_120">120분 이상</option>
+              <option value="MIN_150">150분 이상</option>
+              <option value="MIN_180" selected>180분 이상</option>
+              <option value="MIN_210">210분 이상</option>
+              <option value="MIN_240">240분 이상</option>
+            </select>
+          </div>
 
-        if (result.success) {
-          const data = result.data;
+          <!-- 이용 일수 -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-slate-700 mb-1"
+              >월 이용 일수(회)</label
+            >
+            <input
+              type="number"
+              id="days"
+              value="20"
+              min="1"
+              max="31"
+              class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
 
-          // TAB 1: 재가 월한도액 표[cite: 37]
-          const limitNames = { GRADE_1: '1등급', GRADE_2: '2등급', GRADE_3: '3등급', GRADE_4: '4등급', GRADE_5: '5등급', COGNITIVE: '인지지원등급' };
-          document.getElementById('limitTableBody').innerHTML = Object.keys(data.monthlyLimits).map(key => {
-            const limit = data.monthlyLimits[key];
-            return `
+          <!-- 버튼 -->
+          <div class="md:col-span-2 mt-2">
+            <button
+              type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition duration-200 shadow-sm"
+            >
+              본인부담금 계산하기
+            </button>
+          </div>
+        </form>
+
+        <!-- 계산 결과 카드 -->
+        <div
+          id="resultCard"
+          class="hidden mt-8 bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-3"
+        >
+          <h3 class="font-bold text-slate-900 border-b border-slate-200 pb-2">
+            📊 시뮬레이션 계산 결과
+          </h3>
+
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <span class="text-slate-600">월 지원 한도액:</span>
+            <span id="monthlyLimit" class="text-right font-bold text-slate-800"
+              >0 원</span
+            >
+
+            <span class="text-slate-600">이번 달 총 급여비용:</span>
+            <span id="totalCost" class="text-right font-bold text-slate-800"
+              >0 원</span
+            >
+
+            <span class="text-slate-600">국가 부담금 (공단 지원금):</span>
+            <span id="nhisAmount" class="text-right font-bold text-blue-600"
+              >0 원</span
+            >
+          </div>
+
+          <div
+            class="flex justify-between items-center bg-rose-100 text-rose-800 p-3.5 rounded-lg"
+          >
+            <span class="font-bold">실제 내실 본인부담금</span>
+            <span id="copayAmount" class="font-bold text-xl">0 원</span>
+          </div>
+
+          <div
+            class="flex justify-between items-center text-xs pt-1 text-slate-500"
+          >
+            <span>남은 지원 한도액:</span>
+            <span id="remainingLimit" class="font-bold text-emerald-600 text-sm"
+              >0 원</span
+            >
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // 현재 접속한 도메인이 로컬(localhost)인지 배포 환경(Vercel/GitHub Pages)인지 자동 판별
+      const isLocal =
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1';
+
+      // Render 백엔드 주소 (공개 엔드포인트)
+      const RENDER_BACKEND_URL =
+        'https://care-calculator-api.onrender.com/api/v1';
+
+      // 환경에 맞게 API URL 자동 전환
+      const API_BASE_URL = isLocal
+        ? 'http://localhost:4000/api/v1'
+        : RENDER_BACKEND_URL;
+      const formatWon = (num) =>
+        new Intl.NumberFormat('ko-KR').format(num) + ' 원';
+
+      // 1. 탭 전환 로직
+      function switchTab(tabId) {
+        document
+          .querySelectorAll('.tab-content')
+          .forEach((el) => el.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach((el) => {
+          el.classList.remove('border-blue-600', 'text-blue-600');
+          el.classList.add('border-transparent', 'text-slate-500');
+        });
+
+        document.getElementById(tabId).classList.remove('hidden');
+        const btn = document.getElementById(`btn-${tabId}`);
+        btn.classList.remove('border-transparent', 'text-slate-500');
+        btn.classList.add('border-blue-600', 'text-blue-600');
+      }
+
+      // 2. 백엔드 GET /rates API 호출해서 3개 탭 표 모두 렌더링
+      async function loadRates() {
+        try {
+          const response = await fetch(`${API_BASE_URL}/rates`);
+          const result = await response.json();
+
+          if (result.success) {
+            const data = result.data;
+
+            // TAB 1: 재가 월한도액 표[cite: 37]
+            const limitNames = {
+              GRADE_1: '1등급',
+              GRADE_2: '2등급',
+              GRADE_3: '3등급',
+              GRADE_4: '4등급',
+              GRADE_5: '5등급',
+              COGNITIVE: '인지지원등급',
+            };
+            document.getElementById('limitTableBody').innerHTML = Object.keys(
+              data.monthlyLimits,
+            )
+              .map((key) => {
+                const limit = data.monthlyLimits[key];
+                return `
               <tr class="hover:bg-slate-50">
                 <td class="py-3 px-4 font-semibold text-slate-900">${limitNames[key]}</td>
                 <td class="py-3 px-4 text-right font-bold text-slate-800">${formatWon(limit)}</td>
                 <td class="py-3 px-4 text-right text-rose-600 font-medium">${formatWon(Math.floor(limit * 0.15))}</td>
                 <td class="py-3 px-4 text-right text-blue-600 font-medium">${formatWon(limit - Math.floor(limit * 0.15))}</td>
               </tr>`;
-          }).join('');
+              })
+              .join('');
 
-          // TAB 2: 방문요양 수가표[cite: 45]
-          const visitNames = { MIN_30: '30분 이상', MIN_60: '60분 이상', MIN_90: '90분 이상', MIN_120: '120분 이상', MIN_150: '150분 이상', MIN_180: '180분 이상', MIN_210: '210분 이상', MIN_240: '240분 이상' };
-          document.getElementById('visitTableBody').innerHTML = Object.keys(data.visitCareRates).map(key => {
-            const price = data.visitCareRates[key];
-            return `
+            // TAB 2: 방문요양 수가표[cite: 45]
+            const visitNames = {
+              MIN_30: '30분 이상',
+              MIN_60: '60분 이상',
+              MIN_90: '90분 이상',
+              MIN_120: '120분 이상',
+              MIN_150: '150분 이상',
+              MIN_180: '180분 이상',
+              MIN_210: '210분 이상',
+              MIN_240: '240분 이상',
+            };
+            document.getElementById('visitTableBody').innerHTML = Object.keys(
+              data.visitCareRates,
+            )
+              .map((key) => {
+                const price = data.visitCareRates[key];
+                return `
               <tr class="hover:bg-slate-50">
                 <td class="py-3 px-4 font-semibold text-slate-900">${visitNames[key]}</td>
                 <td class="py-3 px-4 text-right font-bold text-slate-800">${formatWon(price)}</td>
                 <td class="py-3 px-4 text-right text-rose-600 font-medium">${formatWon(Math.floor(price * 0.15))}</td>
               </tr>`;
-          }).join('');
+              })
+              .join('');
 
-          // TAB 3: 요양원 1일 수가표[cite: 87]
-          const facilityNames = { GRADE_1: '1등급', GRADE_2: '2등급', GRADE_3_TO_5: '3~5등급' };
-          document.getElementById('facilityTableBody').innerHTML = Object.keys(data.facilityDailyRates).map(key => {
-            const daily = data.facilityDailyRates[key];
-            const copay30 = Math.floor(daily * 30 * 0.20); // 시설 본인부담 20%
-            return `
+            // TAB 3: 요양원 1일 수가표[cite: 87]
+            const facilityNames = {
+              GRADE_1: '1등급',
+              GRADE_2: '2등급',
+              GRADE_3_TO_5: '3~5등급',
+            };
+            document.getElementById('facilityTableBody').innerHTML =
+              Object.keys(data.facilityDailyRates)
+                .map((key) => {
+                  const daily = data.facilityDailyRates[key];
+                  const copay30 = Math.floor(daily * 30 * 0.2); // 시설 본인부담 20%
+                  return `
               <tr class="hover:bg-slate-50">
                 <td class="py-3 px-4 font-semibold text-slate-900">${facilityNames[key]}</td>
                 <td class="py-3 px-4 text-right font-bold text-slate-800">${formatWon(daily)}</td>
                 <td class="py-3 px-4 text-right text-rose-600 font-medium">${formatWon(copay30)}</td>
               </tr>`;
-          }).join('');
+                })
+                .join('');
+          }
+        } catch (err) {
+          console.error(err);
         }
-      } catch (err) {
-        console.error(err);
       }
-    }
 
-    // 3. 서비스 종류 토글
-    document.getElementById('serviceType').addEventListener('change', (e) => {
-      const wrapper = document.getElementById('timeCodeWrapper');
-      if (e.target.value === 'VISIT_CARE') {
-        wrapper.classList.remove('hidden');
-      } else {
-        wrapper.classList.add('hidden');
-      }
-    });
+      // 3. 서비스 종류 토글
+      document.getElementById('serviceType').addEventListener('change', (e) => {
+        const wrapper = document.getElementById('timeCodeWrapper');
+        if (e.target.value === 'VISIT_CARE') {
+          wrapper.classList.remove('hidden');
+        } else {
+          wrapper.classList.add('hidden');
+        }
+      });
 
-    // 4. 계산기 POST 호출
-    document.getElementById('calcForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+      // 4. 계산기 POST 호출
+      document
+        .getElementById('calcForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
 
-      const payload = {
-        grade: document.getElementById('grade').value,
-        copayType: document.getElementById('copayType').value,
-        serviceType: document.getElementById('serviceType').value,
-        timeCode: document.getElementById('timeCode').value,
-        days: Number(document.getElementById('days').value)
-      };
+          const payload = {
+            grade: document.getElementById('grade').value,
+            copayType: document.getElementById('copayType').value,
+            serviceType: document.getElementById('serviceType').value,
+            timeCode: document.getElementById('timeCode').value,
+            days: Number(document.getElementById('days').value),
+          };
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/calculate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          try {
+            const response = await fetch(`${API_BASE_URL}/calculate`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              const {
+                monthlyLimit,
+                totalCost,
+                nhisAmount,
+                copayAmount,
+                remainingLimit,
+              } = data.result;
+
+              document.getElementById('monthlyLimit').textContent =
+                formatWon(monthlyLimit);
+              document.getElementById('totalCost').textContent =
+                formatWon(totalCost);
+              document.getElementById('nhisAmount').textContent =
+                formatWon(nhisAmount);
+              document.getElementById('copayAmount').textContent =
+                formatWon(copayAmount);
+              document.getElementById('remainingLimit').textContent =
+                formatWon(remainingLimit);
+
+              document.getElementById('resultCard').classList.remove('hidden');
+            }
+          } catch (err) {
+            alert('서버 연동 오류');
+          }
         });
 
-        const data = await response.json();
-
-        if (data.success) {
-          const { monthlyLimit, totalCost, nhisAmount, copayAmount, remainingLimit } = data.result;
-
-          document.getElementById('monthlyLimit').textContent = formatWon(monthlyLimit);
-          document.getElementById('totalCost').textContent = formatWon(totalCost);
-          document.getElementById('nhisAmount').textContent = formatWon(nhisAmount);
-          document.getElementById('copayAmount').textContent = formatWon(copayAmount);
-          document.getElementById('remainingLimit').textContent = formatWon(remainingLimit);
-
-          document.getElementById('resultCard').classList.remove('hidden');
-        }
-      } catch (err) {
-        alert('서버 연동 오류');
-      }
-    });
-
-    // 최초 로드
-    loadRates();
-  </script>
-</body>
+      // 최초 로드
+      loadRates();
+    </script>
+  </body>
 </html>
