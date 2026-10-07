@@ -8,14 +8,18 @@
   </head>
   <body>
     <div class="container">
-      <h2>🏥 장기요양보험 계산기</h2>
+      <h2>🏥 장기요양보험 통합 플랫폼</h2>
 
+      <!-- 탭 헤더 (3개로 확장) -->
       <div class="tab-group">
         <button class="tab-btn active" onclick="switchTab('client')">
-          보호자용 (본인부담금)
+          보호자용 (수가/본인부담금)
         </button>
         <button class="tab-btn" onclick="switchTab('institution')">
           원장님용 (인건비/가감산)
+        </button>
+        <button class="tab-btn" onclick="switchTab('simulator')">
+          등급 판정 시뮬레이터
         </button>
       </div>
 
@@ -59,7 +63,6 @@
         <!-- 탭 2: 원장님용 -->
         <div id="tab-institution" class="tab-content">
           <h3>기관 인건비 비율 & 배치 가감산 산출</h3>
-
           <div class="form-group">
             <label>시설 유형</label>
             <select id="inst-type">
@@ -131,6 +134,48 @@
               <span>인건비 비율 충족 여부:</span>
               <span id="res-ratio-status" class="status-badge">검증 전</span>
             </div>
+          </div>
+        </div>
+
+        <!-- 탭 3: [신규] 등급 판정 가상 시뮬레이터 -->
+        <div id="tab-simulator" class="tab-content">
+          <h3>📋 장기요양 예상 등급 간이 테스트</h3>
+          <p style="font-size: 13px; color: #64748b; margin-bottom: 20px">
+            건보공단 52개 조사항목 기반 핵심 설문입니다. 어르신의 현재 상태에
+            가장 가까운 항목을 선택해 주세요.
+          </p>
+
+          <!-- 질문목록이 동적으로 들어올 영억 -->
+          <form id="simulator-form">
+            <div id="questions-container">문항을 불러오는 중입니다...</div>
+            <button type="button" class="submit-btn" onclick="predictGrade()">
+              예상 등급 판정하기
+            </button>
+          </form>
+
+          <!-- 시뮬레이터 결과 영역 -->
+          <div id="sim-result" class="result-box">
+            <div class="result-item">
+              <span>합산 인정 점수:</span><span id="res-sim-score">0점</span>
+            </div>
+            <div class="result-item">
+              <span>예상 장기요양 등급:</span
+              ><strong id="res-sim-grade" style="color: var(--primary)"
+                >판정 전</strong
+              >
+            </div>
+            <div class="result-item">
+              <span>예상 월 한도액:</span><span id="res-sim-limit">0원</span>
+            </div>
+            <div
+              style="
+                margin-top: 10px;
+                font-size: 13px;
+                color: #475569;
+                line-height: 1.4;
+              "
+              id="res-sim-desc"
+            ></div>
           </div>
         </div>
       </div>
